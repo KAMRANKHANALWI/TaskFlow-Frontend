@@ -1,36 +1,112 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TaskFlow Frontend
 
-## Getting Started
+The Next.js frontend for TaskFlow — a full-stack task management application.
 
-First, run the development server:
+## Tech Stack
+
+- **Next.js 16** — React framework with App Router
+- **TypeScript** — type safety throughout
+- **Tailwind CSS** — utility-first styling
+- **Turbopack** — fast dev server bundler
+- **Bun** — package manager and runtime
+
+## Backend
+
+This frontend connects to the TaskFlow REST API.
+Backend repo: [TaskFlow](https://github.com/KAMRANKHANALWI/TaskFlow)
+Backend runs on: `http://localhost:8000`
+
+## Project Structure
+
+```
+app/
+├── layout.tsx        # root layout — fonts, metadata
+├── page.tsx          # home page
+├── globals.css       # global styles + Tailwind
+│
+├── (auth)/           # auth route group
+│   ├── login/
+│   └── register/
+│
+├── dashboard/        # protected pages
+│   ├── page.tsx      # dashboard home
+│   ├── projects/     # project pages
+│   └── tasks/        # task pages
+│
+├── components/       # reusable UI components
+│   ├── ui/           # base components (button, input, card)
+│   ├── auth/         # login form, register form
+│   ├── projects/     # project card, project list
+│   └── tasks/        # task card, task list, task filters
+│
+├── lib/              # utilities
+│   ├── api.ts        # axios instance + API calls
+│   ├── auth.ts       # token storage + auth helpers
+│   └── types.ts      # TypeScript types matching backend schemas
+│
+└── hooks/            # custom React hooks
+    ├── useAuth.ts    # auth state
+    ├── useProjects.ts
+    └── useTasks.ts
+```
+
+## Setup
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
+# clone
+git clone https://github.com/KAMRANKHANALWI/TaskFlow-Frontend.git
+cd taskflow-frontend
+
+# install dependencies
+bun install
+
+# create environment file
+cp .env.example .env.local
+# set NEXT_PUBLIC_API_URL=http://localhost:8000
+
+# run dev server
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable | Value | Description |
+|----------|-------|-------------|
+| NEXT_PUBLIC_API_URL | http://localhost:8000 | FastAPI backend URL |
 
-## Learn More
+## Pages
 
-To learn more about Next.js, take a look at the following resources:
+| Route | Description | Auth required |
+|-------|-------------|---------------|
+| / | Landing page | No |
+| /login | Login form | No |
+| /register | Register form | No |
+| /dashboard | Overview | Yes |
+| /dashboard/projects | Project list | Yes |
+| /dashboard/projects/[id] | Project detail + tasks | Yes |
+| /dashboard/tasks | All tasks with filters | Yes |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Running with Backend
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Start both servers:
 
-## Deploy on Vercel
+```bash
+# terminal 1 — backend
+cd TaskFlow
+uv run uvicorn app.main:app --reload
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# terminal 2 — frontend
+cd taskflow-frontend
+bun dev
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Roadmap
+
+- [ ] Auth pages — login, register
+- [ ] Dashboard layout with sidebar
+- [ ] Projects — list, create, edit, delete
+- [ ] Tasks — list, create, edit, delete, filters
+- [ ] Tags — create and assign to tasks
+- [ ] Deploy frontend to Vercel
