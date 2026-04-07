@@ -16,7 +16,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   }, [isAuthenticated, loading, router])
 
-  // still checking auth
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -25,7 +24,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     )
   }
 
-  // not authenticated — don't flash content, just show nothing while redirecting
   if (!isAuthenticated) return null
 
   return (

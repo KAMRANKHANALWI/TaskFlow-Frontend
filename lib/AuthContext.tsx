@@ -5,7 +5,6 @@ import { authApi } from "./api"
 import { authStorage } from "./auth"
 import type { User } from "./types"
 
-// ── Types ─────────────────────────────────────────────
 interface AuthContextType {
   user: User | null
   loading: boolean
@@ -14,28 +13,31 @@ interface AuthContextType {
   logout: () => void
 }
 
-// ── Context ───────────────────────────────────────────
 const AuthContext = createContext<AuthContextType | null>(null)
 
-// ── Provider ──────────────────────────────────────────
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
 
-  // on app load — if token exists, fetch current user
   useEffect(() => {
     async function loadUser() {
-      if (authStorage.isAuthenticated()) {
-        try {
-          const response = await authApi.me()
-          setUser(response.data)
-        } catch {
-          // token invalid or expired — clean up
-          authStorage.removeToken()
-        }
+      // no token at all — done immediately, no API call needed
+      if (!authStorage.isAuthenticated()) {
+        setLoading(false)
+        return
       }
-      setLoading(false)
+
+      // token exists — fetch user to validate it
+      try {
+        const response = await authApi.me()
+        setUser(response.data)
+      } catch {
+        // token invalid or expired
+        authStorage.removeToken()
+      } finally {
+        setLoading(false)
+      }
     }
     loadUser()
   }, [])
@@ -43,10 +45,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     const tokenResponse = await authApi.login({ username: email, password })
     authStorage.setToken(tokenResponse.data.access_token)
-
     const userResponse = await authApi.me()
     setUser(userResponse.data)
-
     router.push("/dashboard")
   }
 
@@ -69,7 +69,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   )
 }
 
-// ── Hook ──────────────────────────────────────────────
 export function useAuth() {
   const context = useContext(AuthContext)
   if (!context) throw new Error("useAuth must be used inside AuthProvider")
